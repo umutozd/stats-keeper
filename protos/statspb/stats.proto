@@ -1,0 +1,10 @@
+syntax = "proto3";
+package com.statskeeper.v1;
+
+option go_package = ".;statspb";
+
+// TODO: HelloMessage is a p.o.c. proto message and will be replaced later.
+message HelloMessage {
+  string hello = 1;
+  int32 world = 2;
+}
