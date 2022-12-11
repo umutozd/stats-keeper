@@ -9,7 +9,7 @@ PROTOC_URL="https://github.com/protocolbuffers/protobuf/releases/download/v${PRO
 mkdir -p bin && mkdir -p bin/protoc-bin
 (cd bin/protoc-bin && curl -LO $PROTOC_URL && unzip -o $PROTO_ARTIFACT)
 mv -f ./bin/protoc-bin/bin/protoc ./bin/protoc
-mv -f ./bin/protoc-bin/include/google ./protos/google
+rm -rf ./protos/google && mv -f ./bin/protoc-bin/include/google ./protos/google
 rm -rf bin/protoc-bin
 
 GOOGLE_IMPORT_PATH=$ROOT/protos
