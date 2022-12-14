@@ -1,7 +1,8 @@
 package server
 
 import (
-	"errors"
+	"fmt"
+	"net/http"
 
 	"github.com/umutozd/stats-keeper/storage"
 )
@@ -26,5 +27,12 @@ func NewServer(cfg *Config) (*Server, error) {
 
 // ListenHTTP initiates the HTTP listening and serving incoming requests. It returns only when process ends.
 func (s *Server) ListenHTTP() error {
-	return errors.New("not implemented")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/stats/list", s.ListUserStats)
+	mux.HandleFunc("/api/stats/get", s.GetStat)
+	mux.HandleFunc("/api/stats/add", s.AddStat)
+	mux.HandleFunc("/api/stats/delete", s.DeleteStat)
+	mux.HandleFunc("/api/stats/update", s.UpdateStat)
+
+	return http.ListenAndServe(fmt.Sprintf(":%d", s.cfg.HttpPort), mux)
 }
