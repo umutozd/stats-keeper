@@ -1,25 +1,45 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"time"
+	"os"
 
-	"github.com/umutozd/stats-keeper/protos/statspb"
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/sirupsen/logrus"
+	"github.com/umutozd/stats-keeper/server"
+	"github.com/urfave/cli/v2"
 )
 
+var config = server.NewConfig()
+
 func main() {
-	msg := &statspb.ComponentDate{
-		Timestamps: []*timestamppb.Timestamp{
-			timestamppb.New(time.Now()),
+	app := cli.NewApp()
+	app.Name = "StatsKeeper Rest API"
+	app.Flags = []cli.Flag{
+		&cli.IntFlag{
+			Name:        "http-port",
+			Value:       config.HttpPort,
+			Destination: &config.HttpPort,
+			EnvVars:     []string{"SKEEPER_HTTP_PORT"},
+			Usage:       "the port to listen for http requests",
+		},
+		&cli.StringFlag{
+			Name:        "database-url",
+			Destination: &config.DatabaseUrl,
+			EnvVars:     []string{"SKEEPER_DATABASE_URL"},
+			Usage:       "the url of the database server to connect to",
 		},
 	}
-	d, err := json.MarshalIndent(msg, "", " ")
-	if err != nil {
-		log.Fatalf("error marshaling message: %v", err)
-	}
+	app.Action = actionFunc
 
-	fmt.Printf("marshaled message: %s", string(d))
+	if err := app.Run(os.Args); err != nil {
+		logrus.WithError(err).Fatal("server exited with error")
+	}
+}
+
+// actionFunc is the function called when cli app is run
+func actionFunc(c *cli.Context) error {
+	srv, err := server.NewServer(config)
+	if err != nil {
+		return err
+	}
+	return srv.ListenHTTP()
 }
