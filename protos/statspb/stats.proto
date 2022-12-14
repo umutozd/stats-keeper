@@ -15,6 +15,8 @@ message StatisticEntity {
   string id = 1;
   // The mutable name of the entity
   string name = 2;
+  // The unique id of the user that owns this entity
+  string user_id = 3;
   // component is the actual value of the entity. It's number starts from 100
   // because other fields can be added to StatisticEntity and still components
   // should semantically be the last one.
