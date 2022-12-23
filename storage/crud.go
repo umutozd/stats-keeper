@@ -103,7 +103,7 @@ func (s *storage) ListUserStatistics(ctx context.Context, userId string) ([]*sta
 	var result []*statspb.StatisticEntity
 	var internalResult []*statisticEntity
 
-	filter := bson.M{"user_id": userId}
+	filter := bson.M{"user_id": userId, "deleted": false}
 	cursor, err := s.statistics().Find(ctx, filter)
 	if err != nil {
 		return nil, NewErrorInternal(err, "error listing statistics")
