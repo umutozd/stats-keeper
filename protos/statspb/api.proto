@@ -6,13 +6,7 @@ option go_package = ".;statspb";
 import "google/protobuf/field_mask.proto";
 import "stats.proto";
 
-message ListUserStatisticsRequest { string user_id = 1; }
-
 message ListUserStatisticsResponse { repeated StatisticEntity entities = 1; }
-
-message GetStatisticRequest { string entity_id = 1; }
-
-message DeleteStatisticRequest { string entity_id = 1; }
 
 message UpdateStatisticRequest {
   google.protobuf.FieldMask fields = 1;
