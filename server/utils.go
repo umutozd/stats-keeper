@@ -33,11 +33,11 @@ func unmarshalRequestBody[T proto.Message](w http.ResponseWriter, r *http.Reques
 
 type apiError struct {
 	Message string `json:"message"`
-	Err     error  `json:"error,omitempty"`
+	Err     string `json:"error,omitempty"`
 }
 
 func (e *apiError) Error() string {
-	return fmt.Sprintf("apiError: %s; %v", e.Message, e.Err)
+	return fmt.Sprintf("apiError: %s; %s", e.Message, e.Err)
 }
 
 func writeStorageError(w http.ResponseWriter, err error) {
@@ -47,7 +47,11 @@ func writeStorageError(w http.ResponseWriter, err error) {
 
 // writeErrorResponse writes an apiError to w with statusCode.
 func writeErrorResponse(w http.ResponseWriter, statusCode int, message string, err error) {
-	writeJsonResponse(w, statusCode, &apiError{Message: message, Err: err})
+	ae := &apiError{Message: message, Err: ""}
+	if err != nil {
+		ae.Err = err.Error()
+	}
+	writeJsonResponse(w, statusCode, ae)
 }
 
 // writeJsonResponse json-marshals the given data and writes it along with statusCode
@@ -92,4 +96,26 @@ func validateRequestMethod(w http.ResponseWriter, r *http.Request, allowedMethod
 	w.WriteHeader(http.StatusMethodNotAllowed)
 	w.Header().Set("Allow", strings.Join(allowedMethods, ", "))
 	return false
+}
+
+// responseWriter is an adapter for the actual http.ResponseWriter. It's intended to
+// intercept http status codes and written byte count for logging.
+type responseWriter struct {
+	actual       http.ResponseWriter
+	bytesWritten int
+	status       int
+}
+
+func (rw *responseWriter) Header() http.Header {
+	return rw.actual.Header()
+}
+
+func (rw *responseWriter) Write(data []byte) (int, error) {
+	rw.bytesWritten += len(data)
+	return rw.actual.Write(data)
+}
+
+func (rw *responseWriter) WriteHeader(statusCode int) {
+	rw.status = statusCode
+	rw.actual.WriteHeader(statusCode)
 }
