@@ -101,7 +101,7 @@ func Test_storage_GetStatistic(t *testing.T) {
 			name:          "case 1 - not found",
 			entity:        nil,
 			entityId:      "entity-1",
-			expectedError: NewErrorNotFound("statistic not found"),
+			expectedError: NewErrorNotFound(nil, "statistic not found"),
 		},
 		{
 			name: "case 2 - success",
@@ -149,7 +149,7 @@ func Test_storage_GetStatistic(t *testing.T) {
 				Deleted: true,
 			},
 			entityId:      "id-1",
-			expectedError: NewErrorNotFound("statistic not found"),
+			expectedError: NewErrorNotFound(nil, "statistic not found"),
 		},
 	}
 	for _, tt := range tests {
@@ -196,7 +196,7 @@ func Test_storage_UpdateStatistic(t *testing.T) {
 					},
 				},
 			},
-			expectedError:  NewErrorNotFound("statistic not found"),
+			expectedError:  NewErrorNotFound(nil, "statistic not found"),
 			expectedEntity: nil,
 		},
 		{
@@ -207,7 +207,7 @@ func Test_storage_UpdateStatistic(t *testing.T) {
 				Id:     "id-1-updated",
 				UserId: "user-1-updated",
 			},
-			expectedError:  NewErrorNotFound("statistic not found"),
+			expectedError:  NewErrorNotFound(nil, "statistic not found"),
 			expectedEntity: nil,
 		},
 		{
@@ -226,7 +226,7 @@ func Test_storage_UpdateStatistic(t *testing.T) {
 			values: &statspb.StatisticEntity{
 				Id: "id-1",
 			},
-			expectedError:  NewErrorNoUpdate("no update possible"),
+			expectedError:  NewErrorNoUpdate(nil, "no update possible"),
 			expectedEntity: nil,
 		},
 		{
@@ -250,7 +250,7 @@ func Test_storage_UpdateStatistic(t *testing.T) {
 					},
 				},
 			},
-			expectedError:  NewErrorInvalidArgument("component cannot be changed from %s to %s", statspb.ComponentType_COUNTER, statspb.ComponentType_DATE),
+			expectedError:  NewErrorInvalidArgument(nil, "component cannot be changed from %s to %s", statspb.ComponentType_COUNTER, statspb.ComponentType_DATE),
 			expectedEntity: nil,
 		},
 		{
@@ -274,7 +274,7 @@ func Test_storage_UpdateStatistic(t *testing.T) {
 					},
 				},
 			},
-			expectedError:  NewErrorInvalidArgument("component cannot be changed from %s to %s", statspb.ComponentType_DATE, statspb.ComponentType_COUNTER),
+			expectedError:  NewErrorInvalidArgument(nil, "component cannot be changed from %s to %s", statspb.ComponentType_DATE, statspb.ComponentType_COUNTER),
 			expectedEntity: nil,
 		},
 		{
@@ -298,7 +298,7 @@ func Test_storage_UpdateStatistic(t *testing.T) {
 					},
 				},
 			},
-			expectedError:  NewErrorNoUpdate("no update possible"),
+			expectedError:  NewErrorNoUpdate(nil, "no update possible"),
 			expectedEntity: nil,
 		},
 		{
@@ -322,7 +322,7 @@ func Test_storage_UpdateStatistic(t *testing.T) {
 					},
 				},
 			},
-			expectedError:  NewErrorNoUpdate("no update possible"),
+			expectedError:  NewErrorNoUpdate(nil, "no update possible"),
 			expectedEntity: nil,
 		},
 		{
@@ -432,7 +432,7 @@ func Test_storage_DeleteStatistic(t *testing.T) {
 			name:          "case 1 - not found",
 			entity:        nil,
 			entityId:      "id-1",
-			expectedError: NewErrorNotFound("statistic not found"),
+			expectedError: NewErrorNotFound(nil, "statistic not found"),
 		},
 		{
 			name: "case 2 - success",
@@ -465,7 +465,7 @@ func Test_storage_DeleteStatistic(t *testing.T) {
 			// check if it was actually deleted
 			t.Log("checking if statistic is actually deleted")
 			_, err = s.GetStatistic(context.TODO(), tt.entityId)
-			_ = compareErrors(t, NewErrorNotFound("statistic not found"), err)
+			_ = compareErrors(t, NewErrorNotFound(nil, "statistic not found"), err)
 		})
 	}
 }

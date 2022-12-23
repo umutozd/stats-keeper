@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/umutozd/stats-keeper/protos/statspb"
-	"github.com/umutozd/stats-keeper/storage"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -21,7 +20,7 @@ func (s *Server) ListUserStats(w http.ResponseWriter, r *http.Request) {
 
 	entities, err := s.db.ListUserStatistics(r.Context(), in.UserId)
 	if err != nil {
-		writeErrorResponse(w, http.StatusInternalServerError, "error listing user's statistics", err)
+		writeStorageError(w, err)
 		return
 	}
 
@@ -40,11 +39,7 @@ func (s *Server) GetStat(w http.ResponseWriter, r *http.Request) {
 
 	entity, err := s.db.GetStatistic(r.Context(), in.EntityId)
 	if err != nil {
-		if storage.IsNotFoundError(err) {
-			writeErrorResponse(w, http.StatusNotFound, "statistic not found", nil)
-			return
-		}
-		writeErrorResponse(w, http.StatusInternalServerError, "error getting statistic", err)
+		writeStorageError(w, err)
 		return
 	}
 
@@ -63,7 +58,7 @@ func (s *Server) AddStat(w http.ResponseWriter, r *http.Request) {
 
 	entity, err := s.db.CreateStatistic(r.Context(), in)
 	if err != nil {
-		writeErrorResponse(w, http.StatusInternalServerError, "error adding statistic", err)
+		writeStorageError(w, err)
 		return
 	}
 	writeJsonResponse(w, http.StatusOK, entity)
@@ -80,11 +75,7 @@ func (s *Server) DeleteStat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.db.DeleteStatistic(r.Context(), in.EntityId); err != nil {
-		if storage.IsNotFoundError(err) {
-			writeErrorResponse(w, http.StatusNotFound, "statistic not found", nil)
-			return
-		}
-		writeErrorResponse(w, http.StatusInternalServerError, "error deleting statistic", err)
+		writeStorageError(w, err)
 		return
 	} else {
 		writeJsonResponse(w, http.StatusOK, &emptypb.Empty{})
@@ -103,11 +94,7 @@ func (s *Server) UpdateStat(w http.ResponseWriter, r *http.Request) {
 
 	entity, err := s.db.UpdateStatistic(r.Context(), in.Fields.Paths, in.Values)
 	if err != nil {
-		if storage.IsNotFoundError(err) {
-			writeErrorResponse(w, http.StatusNotFound, "statistic not found", nil)
-			return
-		}
-		writeErrorResponse(w, http.StatusInternalServerError, "error deleting statistic", err)
+		writeStorageError(w, err)
 		return
 	}
 	writeJsonResponse(w, http.StatusOK, entity)

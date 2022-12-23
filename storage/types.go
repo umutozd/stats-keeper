@@ -54,6 +54,7 @@ func (se *statisticEntity) fromPB(in *statspb.StatisticEntity) {
 
 type storageError struct {
 	Message string
+	Err     error
 	Type    storageErrorType
 }
 
@@ -97,30 +98,30 @@ func (set storageErrorType) HttpStatus() int {
 }
 
 func (se *storageError) Error() string {
-	return fmt.Sprintf("storage: type=%s; %s", se.Type, se.Message)
+	return fmt.Sprintf("storage: type=%s, error=%v; %s", se.Type, se.Err, se.Message)
 }
 
-func NewErrorInvalidArgument(format string, args ...any) error {
-	return &storageError{Message: fmt.Sprintf(format, args...), Type: storageErrorType_INVALID_ARGUMENT}
+func NewErrorInvalidArgument(err error, format string, args ...any) error {
+	return &storageError{Err: err, Message: fmt.Sprintf(format, args...), Type: storageErrorType_INVALID_ARGUMENT}
 }
 
-func NewErrorNotFound(format string, args ...any) error {
-	return &storageError{Message: fmt.Sprintf(format, args...), Type: storageErrorType_NOT_FOUND}
+func NewErrorNotFound(err error, format string, args ...any) error {
+	return &storageError{Err: err, Message: fmt.Sprintf(format, args...), Type: storageErrorType_NOT_FOUND}
 }
 
-func NewErrorNoUpdate(format string, args ...any) error {
-	return &storageError{Message: fmt.Sprintf(format, args...), Type: storageErrorType_NO_UPDATE}
+func NewErrorNoUpdate(err error, format string, args ...any) error {
+	return &storageError{Err: err, Message: fmt.Sprintf(format, args...), Type: storageErrorType_NO_UPDATE}
 }
 
-func NewErrorInternal(format string, args ...any) error {
-	return &storageError{Message: fmt.Sprintf(format, args...), Type: storageErrorType_INTERNAL}
+func NewErrorInternal(err error, format string, args ...any) error {
+	return &storageError{Err: err, Message: fmt.Sprintf(format, args...), Type: storageErrorType_INTERNAL}
 }
 
-func ToHttpError(err error) (code int, msg string) {
+func ToHttpError(err error) (code int, msg string, wrappedErr error) {
 	if se, ok := err.(*storageError); ok {
-		code, msg = se.Type.HttpStatus(), se.Message
+		code, msg, wrappedErr = se.Type.HttpStatus(), se.Message, se.Err
 	} else {
-		code, msg = http.StatusInternalServerError, err.Error()
+		code, wrappedErr = http.StatusInternalServerError, err
 	}
 	return
 }

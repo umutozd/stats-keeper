@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
+	"github.com/umutozd/stats-keeper/storage"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -36,6 +37,11 @@ type apiError struct {
 
 func (e *apiError) Error() string {
 	return fmt.Sprintf("apiError: %s; %v", e.Message, e.Err)
+}
+
+func writeStorageError(w http.ResponseWriter, err error) {
+	statusCode, message, wrappedErr := storage.ToHttpError(err)
+	writeErrorResponse(w, statusCode, message, wrappedErr)
 }
 
 // writeErrorResponse writes an apiError to w with statusCode.
