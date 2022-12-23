@@ -26,6 +26,13 @@ message StatisticEntity {
   }
 }
 
+// ComponentType is an enumeration that represents each component type.
+enum ComponentType {
+  NONE = 0;
+  COUNTER = 1;
+  DATE = 2;
+}
+
 // ComponentCounter is for statistics where user can only increment. For
 // instance, the number of times the user went to the gym.
 //

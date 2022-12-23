@@ -21,6 +21,56 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ComponentType is an enumeration that represents each component type.
+type ComponentType int32
+
+const (
+	ComponentType_NONE    ComponentType = 0
+	ComponentType_COUNTER ComponentType = 1
+	ComponentType_DATE    ComponentType = 2
+)
+
+// Enum value maps for ComponentType.
+var (
+	ComponentType_name = map[int32]string{
+		0: "NONE",
+		1: "COUNTER",
+		2: "DATE",
+	}
+	ComponentType_value = map[string]int32{
+		"NONE":    0,
+		"COUNTER": 1,
+		"DATE":    2,
+	}
+)
+
+func (x ComponentType) Enum() *ComponentType {
+	p := new(ComponentType)
+	*p = x
+	return p
+}
+
+func (x ComponentType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ComponentType) Descriptor() protoreflect.EnumDescriptor {
+	return file_stats_proto_enumTypes[0].Descriptor()
+}
+
+func (ComponentType) Type() protoreflect.EnumType {
+	return &file_stats_proto_enumTypes[0]
+}
+
+func (x ComponentType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ComponentType.Descriptor instead.
+func (ComponentType) EnumDescriptor() ([]byte, []int) {
+	return file_stats_proto_rawDescGZIP(), []int{0}
+}
+
 // StatisticEntity is the core of the stats-keeper. It has a component
 // that holds the actual value that user keeps track of.
 //
@@ -267,8 +317,11 @@ var file_stats_proto_rawDesc = []byte{
 	0x61, 0x6d, 0x70, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
 	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d,
 	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x0a, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
-	0x70, 0x73, 0x42, 0x0b, 0x5a, 0x09, 0x2e, 0x3b, 0x73, 0x74, 0x61, 0x74, 0x73, 0x70, 0x62, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x73, 0x2a, 0x30, 0x0a, 0x0d, 0x43, 0x6f, 0x6d, 0x70, 0x6f, 0x6e, 0x65, 0x6e, 0x74, 0x54,
+	0x79, 0x70, 0x65, 0x12, 0x08, 0x0a, 0x04, 0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x00, 0x12, 0x0b, 0x0a,
+	0x07, 0x43, 0x4f, 0x55, 0x4e, 0x54, 0x45, 0x52, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x44, 0x41,
+	0x54, 0x45, 0x10, 0x02, 0x42, 0x0b, 0x5a, 0x09, 0x2e, 0x3b, 0x73, 0x74, 0x61, 0x74, 0x73, 0x70,
+	0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -283,17 +336,19 @@ func file_stats_proto_rawDescGZIP() []byte {
 	return file_stats_proto_rawDescData
 }
 
+var file_stats_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_stats_proto_goTypes = []interface{}{
-	(*StatisticEntity)(nil),       // 0: com.statskeeper.v1.StatisticEntity
-	(*ComponentCounter)(nil),      // 1: com.statskeeper.v1.ComponentCounter
-	(*ComponentDate)(nil),         // 2: com.statskeeper.v1.ComponentDate
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(ComponentType)(0),            // 0: com.statskeeper.v1.ComponentType
+	(*StatisticEntity)(nil),       // 1: com.statskeeper.v1.StatisticEntity
+	(*ComponentCounter)(nil),      // 2: com.statskeeper.v1.ComponentCounter
+	(*ComponentDate)(nil),         // 3: com.statskeeper.v1.ComponentDate
+	(*timestamppb.Timestamp)(nil), // 4: google.protobuf.Timestamp
 }
 var file_stats_proto_depIdxs = []int32{
-	1, // 0: com.statskeeper.v1.StatisticEntity.counter:type_name -> com.statskeeper.v1.ComponentCounter
-	2, // 1: com.statskeeper.v1.StatisticEntity.date:type_name -> com.statskeeper.v1.ComponentDate
-	3, // 2: com.statskeeper.v1.ComponentDate.timestamps:type_name -> google.protobuf.Timestamp
+	2, // 0: com.statskeeper.v1.StatisticEntity.counter:type_name -> com.statskeeper.v1.ComponentCounter
+	3, // 1: com.statskeeper.v1.StatisticEntity.date:type_name -> com.statskeeper.v1.ComponentDate
+	4, // 2: com.statskeeper.v1.ComponentDate.timestamps:type_name -> google.protobuf.Timestamp
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -353,13 +408,14 @@ func file_stats_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_stats_proto_rawDesc,
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_stats_proto_goTypes,
 		DependencyIndexes: file_stats_proto_depIdxs,
+		EnumInfos:         file_stats_proto_enumTypes,
 		MessageInfos:      file_stats_proto_msgTypes,
 	}.Build()
 	File_stats_proto = out.File
