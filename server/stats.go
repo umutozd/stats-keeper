@@ -12,16 +12,15 @@ func (s *Server) ListUserStats(w http.ResponseWriter, r *http.Request) {
 	if !validateRequestMethod(w, r, http.MethodGet) {
 		return
 	}
-	in := unmarshalRequestBody(w, r, &statspb.ListUserStatisticsRequest{})
-	if in == nil {
-		return
-	}
-	if in.UserId == "" {
+
+	q := r.URL.Query()
+	userId := q.Get("user_id")
+	if userId == "" {
 		writeErrorResponse(w, http.StatusBadRequest, "user_id cannot be empty", nil)
 		return
 	}
 
-	entities, err := s.db.ListUserStatistics(r.Context(), in.UserId)
+	entities, err := s.db.ListUserStatistics(r.Context(), userId)
 	if err != nil {
 		writeStorageError(w, err)
 		return
@@ -34,16 +33,15 @@ func (s *Server) GetStat(w http.ResponseWriter, r *http.Request) {
 	if !validateRequestMethod(w, r, http.MethodGet) {
 		return
 	}
-	in := unmarshalRequestBody(w, r, &statspb.GetStatisticRequest{})
-	if in == nil {
-		return
-	}
-	if in.EntityId == "" {
+
+	q := r.URL.Query()
+	entityId := q.Get("entity_id")
+	if entityId == "" {
 		writeErrorResponse(w, http.StatusBadRequest, "entity_id cannot be empty", nil)
 		return
 	}
 
-	entity, err := s.db.GetStatistic(r.Context(), in.EntityId)
+	entity, err := s.db.GetStatistic(r.Context(), entityId)
 	if err != nil {
 		writeStorageError(w, err)
 		return
@@ -77,16 +75,15 @@ func (s *Server) DeleteStat(w http.ResponseWriter, r *http.Request) {
 	if !validateRequestMethod(w, r, http.MethodDelete) {
 		return
 	}
-	in := unmarshalRequestBody(w, r, &statspb.DeleteStatisticRequest{})
-	if in == nil {
-		return
-	}
-	if in.EntityId == "" {
+
+	q := r.URL.Query()
+	entityId := q.Get("entity_id")
+	if entityId == "" {
 		writeErrorResponse(w, http.StatusBadRequest, "entity_id cannot be empty", nil)
 		return
 	}
 
-	if err := s.db.DeleteStatistic(r.Context(), in.EntityId); err != nil {
+	if err := s.db.DeleteStatistic(r.Context(), entityId); err != nil {
 		writeStorageError(w, err)
 		return
 	} else {
