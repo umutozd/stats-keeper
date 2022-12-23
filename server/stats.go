@@ -9,6 +9,9 @@ import (
 )
 
 func (s *Server) ListUserStats(w http.ResponseWriter, r *http.Request) {
+	if !validateRequestMethod(w, r, http.MethodGet) {
+		return
+	}
 	in := unmarshalRequestBody(w, r, &statspb.ListUserStatisticsRequest{})
 	if in == nil {
 		return
@@ -28,6 +31,9 @@ func (s *Server) ListUserStats(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) GetStat(w http.ResponseWriter, r *http.Request) {
+	if !validateRequestMethod(w, r, http.MethodGet) {
+		return
+	}
 	in := unmarshalRequestBody(w, r, &statspb.GetStatisticRequest{})
 	if in == nil {
 		return
@@ -47,6 +53,9 @@ func (s *Server) GetStat(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) AddStat(w http.ResponseWriter, r *http.Request) {
+	if !validateRequestMethod(w, r, http.MethodPut) {
+		return
+	}
 	in := unmarshalRequestBody(w, r, &statspb.StatisticEntity{})
 	if in == nil {
 		return
@@ -65,6 +74,9 @@ func (s *Server) AddStat(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) DeleteStat(w http.ResponseWriter, r *http.Request) {
+	if !validateRequestMethod(w, r, http.MethodDelete) {
+		return
+	}
 	in := unmarshalRequestBody(w, r, &statspb.DeleteStatisticRequest{})
 	if in == nil {
 		return
@@ -83,6 +95,9 @@ func (s *Server) DeleteStat(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) UpdateStat(w http.ResponseWriter, r *http.Request) {
+	if !validateRequestMethod(w, r, http.MethodPost) {
+		return
+	}
 	in := unmarshalRequestBody(w, r, &statspb.UpdateStatisticRequest{})
 	if in == nil {
 		return

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/umutozd/stats-keeper/storage"
@@ -77,4 +78,18 @@ func writeJsonResponse(w http.ResponseWriter, statusCode int, data any) {
 	if _, err = w.Write(resp); err != nil {
 		logrus.WithError(err).Error("writeJsonResponse: error writing http response")
 	}
+}
+
+// validateRequestMethod checks if given request's method is in the given allowed methods. If so, it returns true.
+// Otherwise, it sets 405 status and Allow header with given allowed methods and returns false.
+func validateRequestMethod(w http.ResponseWriter, r *http.Request, allowedMethods ...string) (isValid bool) {
+	for _, m := range allowedMethods {
+		if r.Method == m {
+			return true
+		}
+	}
+
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	w.Header().Set("Allow", strings.Join(allowedMethods, ", "))
+	return false
 }
