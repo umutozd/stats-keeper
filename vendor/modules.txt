@@ -12,6 +12,10 @@ github.com/klauspost/compress/huff0
 github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
+# github.com/kylelemons/godebug v0.0.0-20160406211939-eadb3ce320cb
+## explicit
+github.com/kylelemons/godebug/diff
+github.com/kylelemons/godebug/pretty
 # github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe
 ## explicit
 github.com/montanaflynn/stats
