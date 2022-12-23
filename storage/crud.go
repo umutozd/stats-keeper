@@ -31,6 +31,9 @@ func (s *storage) GetStatistic(ctx context.Context, entityId string) (*statspb.S
 		}
 		return nil, NewErrorInternal("error getting statistic from database: %v", err)
 	}
+	if se.Deleted {
+		return nil, NewErrorNotFound("statistic not found")
+	}
 	return se.toPB(), nil
 }
 
@@ -111,6 +114,9 @@ func (s *storage) ListUserStatistics(ctx context.Context, userId string) ([]*sta
 
 	for _, se := range internalResult {
 		result = append(result, se.toPB())
+	}
+	if result == nil {
+		result = []*statspb.StatisticEntity{}
 	}
 	return result, nil
 }
