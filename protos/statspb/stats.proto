@@ -38,7 +38,7 @@ enum ComponentType {
 //
 // ComponentCounter is a singular component where each StatisticEntity can have
 // at most one.
-message ComponentCounter { int64 count = 1; }
+message ComponentCounter { uint32 count = 1; }
 
 // ComponentDate is for statistics where the value is a date. For instance, the
 // dates when the dog went to the vet.
