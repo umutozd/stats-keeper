@@ -16,4 +16,4 @@ GOOGLE_IMPORT_PATH=$ROOT/protos
 PROTOC_PATH=$ROOT/bin/protoc
 
 # compile statspb
-$PROTOC_PATH --proto_path=$ROOT/protos/statspb:$GOOGLE_IMPORT_PATH --go_out=$ROOT/protos/statspb $ROOT/protos/statspb/stats.proto
+$PROTOC_PATH --proto_path=$ROOT/protos/statspb:$GOOGLE_IMPORT_PATH --go_out=$ROOT/protos/statspb $ROOT/protos/statspb/*.proto
