@@ -1,0 +1,14 @@
+syntax = "proto3";
+package com.statskeeper.v1;
+
+option go_package = ".;statspb";
+
+import "google/protobuf/field_mask.proto";
+import "stats.proto";
+
+message ListUserStatisticsResponse { repeated StatisticEntity entities = 1; }
+
+message UpdateStatisticRequest {
+  google.protobuf.FieldMask fields = 1;
+  StatisticEntity values = 2;
+}

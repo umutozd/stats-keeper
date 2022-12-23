@@ -15,6 +15,8 @@ message StatisticEntity {
   string id = 1;
   // The mutable name of the entity
   string name = 2;
+  // The unique id of the user that owns this entity
+  string user_id = 3;
   // component is the actual value of the entity. It's number starts from 100
   // because other fields can be added to StatisticEntity and still components
   // should semantically be the last one.
@@ -24,12 +26,19 @@ message StatisticEntity {
   }
 }
 
+// ComponentType is an enumeration that represents each component type.
+enum ComponentType {
+  NONE = 0;
+  COUNTER = 1;
+  DATE = 2;
+}
+
 // ComponentCounter is for statistics where user can only increment. For
 // instance, the number of times the user went to the gym.
 //
 // ComponentCounter is a singular component where each StatisticEntity can have
 // at most one.
-message ComponentCounter { int64 count = 1; }
+message ComponentCounter { uint32 count = 1; }
 
 // ComponentDate is for statistics where the value is a date. For instance, the
 // dates when the dog went to the vet.
