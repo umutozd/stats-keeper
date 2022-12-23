@@ -1,5 +1,11 @@
 package storage
 
+import (
+	"errors"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
+
 func IsNotFoundError(err error) bool {
-	return false // TODO: not implemented
+	return errors.Is(err, mongo.ErrNoDocuments)
 }
