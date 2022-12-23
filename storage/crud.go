@@ -2,10 +2,12 @@ package storage
 
 import (
 	"context"
+	"errors"
 
 	"github.com/umutozd/stats-keeper/protos/statspb"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -15,7 +17,7 @@ func (s *storage) CreateStatistic(ctx context.Context, entity *statspb.Statistic
 	se.Id = primitive.NewObjectID().Hex()
 
 	if _, err := s.statistics().InsertOne(ctx, se); err != nil {
-		return nil, err
+		return nil, NewErrorInternal("error creating statistic: %v", err)
 	}
 	return se.toPB(), nil
 }
@@ -24,7 +26,10 @@ func (s *storage) GetStatistic(ctx context.Context, entityId string) (*statspb.S
 	se := &statisticEntity{}
 	filter := bson.M{"_id": entityId}
 	if err := s.statistics().FindOne(ctx, filter).Decode(se); err != nil {
-		return nil, err
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, NewErrorNotFound("statistic not found")
+		}
+		return nil, NewErrorInternal("error getting statistic from database: %v", err)
 	}
 	return se.toPB(), nil
 }
@@ -35,17 +40,29 @@ func (s *storage) UpdateStatistic(ctx context.Context, fields []string, values *
 	set := bson.M{}
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 
+	entity, err := s.GetStatistic(ctx, values.Id)
+	if err != nil {
+		return nil, err
+	}
+	compType := entity.GetComponentType()
+
 	for _, f := range fields {
 		switch f {
 		case "id", "user_id":
-			// immutable fields, skip them
+			return nil, NewErrorInvalidArgument("fields 'id', 'user_id' cannot be modified")
 		case "name":
 			set[f] = values.Name
 		case "counter":
+			if compType != statspb.ComponentType_COUNTER {
+				return nil, NewErrorInvalidArgument("component cannot be changed from %s to %s", compType, statspb.ComponentType_COUNTER)
+			}
 			if comp := values.GetCounter(); comp != nil {
 				set[f] = comp
 			}
 		case "date":
+			if compType != statspb.ComponentType_DATE {
+				return nil, NewErrorInvalidArgument("component cannot be changed from %s to %s", compType, statspb.ComponentType_DATE)
+			}
 			if comp := values.GetDate(); comp != nil {
 				set[f] = comp
 			}
@@ -53,11 +70,11 @@ func (s *storage) UpdateStatistic(ctx context.Context, fields []string, values *
 	}
 	if len(set) == 0 {
 		// no need to make ineffectual update, short-circuit here
-		return nil, ErrNoUpdatePossible
+		return nil, NewErrorNoUpdate("no update possible")
 	}
 	update := bson.M{"$set": set}
 	if err := s.statistics().FindOneAndUpdate(ctx, filter, update, opts).Decode(&se); err != nil {
-		return nil, err
+		return nil, NewErrorInternal("error updating statistic: %v", err)
 	}
 	return se.toPB(), nil
 }
@@ -70,7 +87,13 @@ func (s *storage) DeleteStatistic(ctx context.Context, entityId string) error {
 		},
 	}
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
-	return s.statistics().FindOneAndUpdate(ctx, filter, update, opts).Err()
+	if err := s.statistics().FindOneAndUpdate(ctx, filter, update, opts).Err(); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return NewErrorNotFound("statistic not found")
+		}
+		return NewErrorInternal("error deleting statistic: %v", err)
+	}
+	return nil
 }
 
 func (s *storage) ListUserStatistics(ctx context.Context, userId string) ([]*statspb.StatisticEntity, error) {
@@ -80,10 +103,10 @@ func (s *storage) ListUserStatistics(ctx context.Context, userId string) ([]*sta
 	filter := bson.M{"user_id": userId}
 	cursor, err := s.statistics().Find(ctx, filter)
 	if err != nil {
-		return nil, err
+		return nil, NewErrorInternal("error listing statistics: %v", err)
 	}
 	if err = cursor.All(ctx, &internalResult); err != nil {
-		return nil, err
+		return nil, NewErrorInternal("error decoding statistics: %v", err)
 	}
 
 	for _, se := range internalResult {

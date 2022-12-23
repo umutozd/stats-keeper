@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"errors"
 
 	"github.com/umutozd/stats-keeper/protos/statspb"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,8 +12,6 @@ const (
 	defaultDatabaseName      = "StatsKeeper"
 	statisticsCollectionName = "Statistics"
 )
-
-var ErrNoUpdatePossible = errors.New("no update possible due to empty parameters or parameters to immutable fields")
 
 // StatsKeeperStorage is the inteface that server will use to interact with the database.
 type StatsKeeperStorage interface {
